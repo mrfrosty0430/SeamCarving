@@ -16,6 +16,13 @@
 
 #define MAX_SEAM 5
 
+struct Node {
+    int index;
+    struct Node* next;
+};
+
+
+
 
 int main(int argc, char *argv[]){
     
@@ -59,15 +66,31 @@ int main(int argc, char *argv[]){
                 dp[i][j] = currmin + arr[i][j];
             }
         }
-        
-        
     }
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            printf("%d ", dp[i][j]);
+    
+    
+    int start = dp[height-1][0];
+    int startidx = 0;
+    for (int j = 0; j < width; j ++){
+        if (dp[height-1][j] < start){
+            start = min(start,dp[height-1][j]);
+            startidx = j;
         }
-        printf("\n");
     }
+    
+    Node* new = malloc(sizeof(struct Node));
+    new -> index = startidx;
+    
+    Node*
+    for (int i = height - 2; i >= 0; i --){
+        int nextval = dp[i][]
+    }
+    
+    
+    
+    printf("startidx:%d, startval:%d\n",startidx,dp[height-1][startidx]);
+    
+    
     
     
     
