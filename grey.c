@@ -1,19 +1,21 @@
+#include "grey.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <stdlib.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
-
-int main(int argc, char *argv[]){
+void grey(const char* input, const char *output_jpg, const char *output_png){
     
     
     
     int width, height, bpp;
 
-    uint8_t* rgb_image = stbi_load(argv[1], &width, &height, &bpp, 0);
+    uint8_t* rgb_image = stbi_load(input, &width, &height, &bpp, 0);
 
     
     printf("width is :%d, height is :%d, bpp is %d\n",width,height,bpp);
@@ -30,9 +32,8 @@ int main(int argc, char *argv[]){
     }
     //const char* result_jpg = sprintf("%s_result.jpg",argv[1]);
    // const char* result_png = sprintf("%s_result.png",argv[1]);
-    stbi_write_jpg(argv[2],width,height,1,(void*)new_image,100);
-    stbi_write_png(argv[3],width,height,1,(void*)new_image,width);
-    return 0;
+    stbi_write_jpg(output_jpg,width,height,1,(void*)new_image,100);
+    stbi_write_png(output_png,width,height,1,(void*)new_image,width);
     
 
 }
