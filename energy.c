@@ -1,4 +1,5 @@
 #include <stdio.h>
+//ugh
 #include <stdint.h>
 #include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
