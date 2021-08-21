@@ -11,16 +11,8 @@
 
 #define MAX_SEAM 10
 
-#ifndef STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-#endif
+#include "sc_utils.h"
 
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
-#endif
-#include "grey.h"
 
 struct Node {
     int index;
@@ -32,34 +24,36 @@ struct Node {
 
 int main(int argc, char *argv[]){
     
+    //int width, height, bpp;
+    //uint8_t* rgb_image = read_image(argv[1], &width, &height, &bpp);
+    //printf("width: %d, height: %d, bpp: %d\n",width,height,bpp);
+    const char* input = argv[1];
+    const char* input_grey = argv[2];
+    const char* output = argv[3];
+    grey(input, input_grey);
     
-    grey("smallbeach.jpg","fuck.jpg","shit.png");
     int width, height, bpp;
-    uint8_t* rgb_image = stbi_load(argv[1], &width, &height, &bpp, 0);
-    printf("width: %d, height: %d, bpp: %d\n",width,height,bpp);
-    
+    uint8_t* grey_image = read_image(input_grey, &width, &height, &bpp);
+    uint8_t* orig_image = read_image(input,&width,&height,&bpp);
+
     int **arr = (int **)malloc(height * sizeof(int *));
     if (arr == NULL) printf("arr is null\n");
     for (int i=0; i<height; i++){
         arr[i] = (int *)malloc(width * sizeof(int));
         if (arr[i] == NULL) printf("inside is null\n");
     }
-    printf("i'm here32 \n");
     int **dp = (int **)malloc(height * sizeof(int *));
     if (dp == NULL) printf("arr is null\n");
     for (int i=0; i<height; i++){
         dp[i] = (int *)malloc(width * sizeof(int));
         if (dp[i] == NULL) printf("inside is null\n");
-    }
-    printf("i'm here32 \n");       
+    }      
     for (int i = 0; i < height; i ++){
         for (int j = 0; j < width; j ++){
             arr[i][j] = *(rgb_image + (i*width)+j);
             dp[i][j] = *(rgb_image + (i*width)+j);
         }
     }
-    printf("i'm here32 \n");
-    
     for (int seam = 0; seam < MAX_SEAM;seam ++){
         
         for (int i = 1; i < height; i ++){
@@ -70,9 +64,6 @@ int main(int argc, char *argv[]){
                 dp[i][j] = currmin + arr[i][j];
             }
         }
-        printf("i'm here112 \n");
-
-    
     
         int start = dp[height-1][0];
         int startidx = 0;
@@ -82,11 +73,9 @@ int main(int argc, char *argv[]){
                 startidx = j;
             }
         }
-        printf("i'm here113 \n");
 
         struct Node* new = malloc(sizeof(struct Node));
         new -> index = startidx;
-        printf("i'm here \n");
         struct Node* curr = new;
         for (int i = height - 2; i >= 0; i --){
             int prev_index = curr->index;
@@ -106,7 +95,6 @@ int main(int argc, char *argv[]){
             temp->index = minindex;
             curr = curr -> next;
         }
-        printf("i'm here2 \n");
         curr = new;
         for (int i = height - 1; i >= 0; i --){
             for (int j = 0; j < width-seam ; j ++){
@@ -117,7 +105,6 @@ int main(int argc, char *argv[]){
             }
             curr = curr->next;
         }
-        printf("i'm here3 \n");
         curr = new;
         int i = 0;
         while(curr != NULL){
@@ -127,11 +114,9 @@ int main(int argc, char *argv[]){
             curr = temp;
             
         }
-        printf("i'm here4 \n");
         printf("seam number is %d\n",seam);
     }
 
-    printf("out of loo3p\n");
     uint8_t* new_image = malloc(sizeof(uint8_t) *((width-MAX_SEAM)*height));
     for (int i = 0; i < height; i ++){
         for (int j = 0; j < width-MAX_SEAM; j ++){
@@ -141,7 +126,6 @@ int main(int argc, char *argv[]){
     printf("out of loop2\n");
 
     //stbi_write_png(argv[2],width,height,1,(void*)new_imagex,width);
-    stbi_write_png(argv[2],width-MAX_SEAM,height,1,(void*)new_image,(width-MAX_SEAM) * sizeof(uint8_t));
+    write_image(output,width-MAX_SEAM,height,1,new_image,(width-MAX_SEAM) * sizeof(uint8_t));
     
-
 }
