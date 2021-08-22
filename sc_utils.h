@@ -12,4 +12,6 @@ uint8_t* read_image(const char* input, int *width_ptr, int *height_ptr,int* bpp_
 
 void grey(const char* input, const char *output);
 
+void energy(const char* input, const char* output);
+
 #endif

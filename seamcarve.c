@@ -9,7 +9,7 @@
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif
 
-#define MAX_SEAM 10
+
 
 #include "sc_utils.h"
 
@@ -21,6 +21,17 @@ struct Node {
 
 
 
+struct pixel{
+    int red; 
+    int blue;
+    int green;
+};
+
+typedef struct pixel pixel_t;
+
+
+
+
 
 int main(int argc, char *argv[]){
     
@@ -29,17 +40,20 @@ int main(int argc, char *argv[]){
     //printf("width: %d, height: %d, bpp: %d\n",width,height,bpp);
     const char* input = argv[1];
     const char* input_grey = argv[2];
-    const char* output = argv[3];
+    const char* input_energy = argv[3];
+    const char* output = argv[4];
+    int MAX_SEAM = atoi(argv[5]);
     grey(input, input_grey);
-    
+    energy(input_grey,input_energy);
+
     int width, height, bpp;
-    uint8_t* grey_image = read_image(input_grey, &width, &height, &bpp);
+    uint8_t* energy_image = read_image(input_energy, &width, &height, &bpp);
     uint8_t* orig_image = read_image(input,&width,&height,&bpp);
 
-    int **arr = (int **)malloc(height * sizeof(int *));
+    pixel_t **arr = (pixel_t **)malloc(height * sizeof(pixel_t *));
     if (arr == NULL) printf("arr is null\n");
     for (int i=0; i<height; i++){
-        arr[i] = (int *)malloc(width * sizeof(int));
+        arr[i] = (pixel_t *)malloc(width * sizeof(pixel_t));
         if (arr[i] == NULL) printf("inside is null\n");
     }
     int **dp = (int **)malloc(height * sizeof(int *));
@@ -50,10 +64,23 @@ int main(int argc, char *argv[]){
     }      
     for (int i = 0; i < height; i ++){
         for (int j = 0; j < width; j ++){
-            arr[i][j] = *(rgb_image + (i*width)+j);
-            dp[i][j] = *(rgb_image + (i*width)+j);
+            arr[i][j].red = *(orig_image + ((i*width)+j) * bpp );
+            arr[i][j].green = *(orig_image + ((i*width)+j) * bpp + 1);
+            arr[i][j].blue = *(orig_image + ((i*width)+j) * bpp + 2);
+            //printf("%d:%d:%d\n",arr[i][j].red,arr[i][j].green,arr[i][j].blue);
+            dp[i][j] = *(energy_image + (i*width)+j);
+            //int k = (i * width) + j;
+            //printf("orig %d:%d:%d\n",*(orig_image + (k * bpp) + 0),*(orig_image + (k * bpp) + 1),*(orig_image + (k * bpp) + 2));
         }
+        //break;
     }
+    /*
+    for (int i =0; i < height*width; i ++){
+        printf("orig %d:%d:%d\n",*(orig_image + (i * bpp) + 0),*(orig_image + (i * bpp) + 1),*(orig_image + (i * bpp) + 2));
+        break;
+    }
+    */
+    
     for (int seam = 0; seam < MAX_SEAM;seam ++){
         
         for (int i = 1; i < height; i ++){
@@ -61,7 +88,7 @@ int main(int argc, char *argv[]){
                 int currmin = dp[i-1][j];
                 if (j-1 >= 0) currmin = min(currmin,dp[i-1][j-1]);
                 if (j+1 < width) currmin = min(currmin,dp[i-1][j+1]);
-                dp[i][j] = currmin + arr[i][j];
+                dp[i][j] = currmin + dp[i][j];
             }
         }
     
@@ -100,7 +127,9 @@ int main(int argc, char *argv[]){
             for (int j = 0; j < width-seam ; j ++){
                 if (j > curr -> index){
                     dp[i][j-1] = dp[i][j];
-                    arr[i][j-1] = arr[i][j];
+                    arr[i][j-1].red = arr[i][j].red;
+                    arr[i][j-1].green = arr[i][j].green;
+                    arr[i][j-1].blue = arr[i][j].blue;
                 }
             }
             curr = curr->next;
@@ -117,15 +146,19 @@ int main(int argc, char *argv[]){
         printf("seam number is %d\n",seam);
     }
 
-    uint8_t* new_image = malloc(sizeof(uint8_t) *((width-MAX_SEAM)*height));
+    uint8_t* new_image = malloc(sizeof(uint8_t) *((width-MAX_SEAM)*height)* bpp);
     for (int i = 0; i < height; i ++){
         for (int j = 0; j < width-MAX_SEAM; j ++){
-            *(new_image + (i*(width-MAX_SEAM)) + j) = arr[i][j];
+            *(new_image + ((i*(width-MAX_SEAM)) + j)*bpp ) = arr[i][j].red;
+            *(new_image + ((i*(width-MAX_SEAM)) + j)*bpp + 1) = arr[i][j].green;
+            *(new_image + ((i*(width-MAX_SEAM)) + j)*bpp + 2) = arr[i][j].blue;
+            
         }
     }
     printf("out of loop2\n");
 
     //stbi_write_png(argv[2],width,height,1,(void*)new_imagex,width);
-    write_image(output,width-MAX_SEAM,height,1,new_image,(width-MAX_SEAM) * sizeof(uint8_t));
+    write_image(output,width-MAX_SEAM,height,bpp,new_image,(width-MAX_SEAM)*bpp);
+    
     
 }
