@@ -81,6 +81,8 @@ void energy(const char* input, const char* output){
     int **kernely = (int **)malloc(3 * sizeof(int *));
     for (i = 0;i < 3; i ++)
         kernely[i] = (int*)malloc(3*sizeof(int));
+
+    int kernel_length = 3;
     kernelx[0][0] = 1;
     kernelx[0][1] = 0;
     kernelx[0][2] = -1;
@@ -113,6 +115,32 @@ void energy(const char* input, const char* output){
             arr[i][j] = *(rgb_image + (i*width)+j);
         }
     }
+    
+    for (int row = 0; row < rows; row ++){
+        for (int col = 0; col < cols; col ++){
+            int origx = kernel_length/2;
+            int origy = kernel_length/2;
+            int accum_num_x = 0;
+            int accum_total_x = 0;
+            int accum_num_y = 0;
+            int accum_total_y = 0;
+            for (int drow = -1 * kernel_length/2; drow < kernel_length/2 + 1; drow ++){
+                for (int dcol = -1 * kernel_length/2; dcol < kernel_length/2 + 1; dcol ++){
+                    
+                    if (row+drow < rows && row + drow >= 0 && col + dcol < cols && col + dcol >= 0) {
+                        accum_total_x += (arr[row+drow][col+dcol] * kernelx[origy+drow][origx+dcol]);
+                        accum_total_y += (arr[row+drow][col+dcol] * kernely[origy+drow][origx+dcol]);
+                        accum_num_x += 1;
+                        accum_num_y += 1;
+                    }
+                }
+            }
+            outx[row][col] = accum_total_x / accum_num_x;
+            outy[row][col] = accum_total_y/accum_num_y;
+        }
+    }
+    
+    /*
     for(int i=0; i < rows; ++i)              // rows
     {
         for(int j=0; j < cols; ++j)          // columns
@@ -139,6 +167,7 @@ void energy(const char* input, const char* output){
             }
         }
     }
+    */
     
     
     for (int i = 0; i < height; i ++){

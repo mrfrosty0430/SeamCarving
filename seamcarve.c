@@ -74,12 +74,7 @@ int main(int argc, char *argv[]){
         }
         //break;
     }
-    /*
-    for (int i =0; i < height*width; i ++){
-        printf("orig %d:%d:%d\n",*(orig_image + (i * bpp) + 0),*(orig_image + (i * bpp) + 1),*(orig_image + (i * bpp) + 2));
-        break;
-    }
-    */
+
     
     for (int seam = 0; seam < MAX_SEAM;seam ++){
         
@@ -159,6 +154,5 @@ int main(int argc, char *argv[]){
 
     //stbi_write_png(argv[2],width,height,1,(void*)new_imagex,width);
     write_image(output,width-MAX_SEAM,height,bpp,new_image,(width-MAX_SEAM)*bpp);
-    
-    
+
 }
