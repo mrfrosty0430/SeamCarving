@@ -11,7 +11,7 @@ void write_image(const char* output, int width, int height,int comp,uint8_t* dat
 }
 
 uint8_t* read_image(const char* input, int *width_ptr, int *height_ptr,int* bpp_ptr){
-    return stbi_load(input,width_ptr,height_ptr,bpp_ptr,0);
+    return stbi_load(input,width_ptr,height_ptr,bpp_ptr);
 }
 
 

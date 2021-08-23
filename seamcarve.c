@@ -45,11 +45,11 @@ int main(int argc, char *argv[]){
     int MAX_SEAM = atoi(argv[5]);
     grey(input, input_grey);
     energy(input_grey,input_energy);
-
+    
     int width, height, bpp;
     uint8_t* energy_image = read_image(input_energy, &width, &height, &bpp);
     uint8_t* orig_image = read_image(input,&width,&height,&bpp);
-
+    printf("width:%d,height:%d,bpp:%d\n");
     pixel_t **arr = (pixel_t **)malloc(height * sizeof(pixel_t *));
     if (arr == NULL) printf("arr is null\n");
     for (int i=0; i<height; i++){
